@@ -1,0 +1,56 @@
+{
+    "manifestVersion": 1,
+    "id": "open-pull-requests",
+    "version": "0.0.26",
+    "name": "Open Pull Requests",
+    "description": "A Visual Studio Services extension which displays all open pull requests across all repositories.",
+    "publisher": "nnessen",
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],
+    "icons": {
+        "default": "images/icon.png"
+    },
+    "contributions": [
+        {
+            "id": "nnessen.OpenPullRequests",
+            "type": "ms.vss-web.hub",
+            "description": "Adds an 'Open Pull Requests' hub to the Code hub group.",
+            "targets": [
+                "ms.vss-code-web.code-hub-group"
+            ],
+            "properties": {
+                "name": "Open Pull Requests",
+                "order": 99,
+                "uri": "pullrequests.html"
+            }
+        }
+    ],
+    "scopes": [
+        "vso.code_write"
+    ],
+    "files": [
+        {
+            "path": "pullrequests.html",
+            "addressable": true
+        },
+        {
+            "path": "scripts",
+            "addressable": true
+        },
+        {
+            "path": "sdk/scripts",
+            "addressable": true
+        },
+        {
+            "path": "images/icon.png",
+            "addressable": true
+        },
+        {
+            "path": "css/app.css",
+            "addressable": true
+        }
+    ]
+}
