@@ -48,16 +48,17 @@ var createBranchCell = function (row, index, pullRequest, baseUri) {
 var createCommentsCell = function (row, index, rowIndex, pullRequest) {
     let cell = row.insertCell(index);
     cell.id = `${rowIndex}|commentCell`;
+    cell.className = "comments";
 
     let icon = document.createElement("span");
     icon.id = `${rowIndex}|commentIcon`;
     icon.title = "Comments";
     icon.alt = icon.title;
-    icon.className = "bowtie-icon bowtie-comment-discussion comment-icon";
+    icon.className = "bowtie-icon bowtie-comment-discussion comment-icon no-display";
 
     let text = document.createElement("span");
     text.id = `${rowIndex}|commentCount`;
-    text.textContent = "?";
+    text.textContent = "Loading...";
     text.className = "comment-count";
 
     cell.appendChild(icon);
@@ -170,7 +171,7 @@ var insertPullRequestRow = function (table, pullRequest, index, baseUri) {
     this.createMergeStatusCell(row, cell++, pullRequest.mergeStatus);
     this.createVotesCell(row, cell++, pullRequest);
     this.createCommentsCell(row, cell++, index, pullRequest);
-}
+};
 
 VSS.require([
     "VSS/Controls",
@@ -233,10 +234,14 @@ VSS.require([
                                         }
 
                                         let element = document.getElementById(`${i}|commentCount`);
+                                        let icon = document.getElementById(`${i}|commentIcon`);
                                         if (element) {
                                             if (pullComments > 0) {
                                                 if (unresolvedComments == 0) {
                                                     element.textContent = "All resolved";
+                                                    if (icon) {
+                                                        icon.className = icon.className.replace("no-display", "");
+                                                    }
                                                     let cell = document.getElementById(`${i}|commentCell`);
                                                     if (cell) {
                                                         cell.className += " comments-resolved";
@@ -244,15 +249,16 @@ VSS.require([
                                                 }
                                                 else {
                                                     element.textContent = `${pullComments - unresolvedComments}/${pullComments} resolved`;
-                                                    let icon = document.getElementById(`${i}|commentIcon`);
                                                     if (icon) {
                                                         icon.className += " comments-unresolved";
+                                                        icon.className = icon.className.replace("no-display", "");
                                                     }
                                                 }
                                             }
 
                                             else {
-                                                element.textContent = "None";
+                                                element.textContent = "";
+                                                
                                             }
                                         }
                                     }

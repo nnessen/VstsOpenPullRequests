@@ -48,6 +48,14 @@ td {
     font-size: 11px !important;
 }
 
+.comments {
+    font-size: 14px;
+}
+
+.no-display {
+    display: none !important;
+}
+
 .comment-count {
     padding-right: 5px;
 }
