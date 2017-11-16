@@ -78,6 +78,7 @@ td {
 
 .reviewer-container {
     display: inline-block;
+    margin-right: 5px;
 }
 
 .row-image {
@@ -88,10 +89,18 @@ td {
 
 .vote {
     margin-left: -9px;
-    margin-right: 5px;
+    margin-top: 14px;
     background-color: white;
     line-height: normal !important;
     border-radius: 50%;
     width: 16px;
     height: 16px;
+}
+
+.suggestions {
+    color: #107c10;
+}
+
+.vote::before {
+    margin-left: 1px;
 }

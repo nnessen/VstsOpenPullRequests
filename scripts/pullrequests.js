@@ -174,12 +174,10 @@ var insertPullRequestRow = function (table, pullRequest, index, baseUri) {
 };
 
 VSS.require([
-    "VSS/Controls",
-    "VSS/Controls/Grids",
     "VSS/Service",
     "TFS/VersionControl/GitRestClient"
     ],
-    function (controls, grids, vssService, gitClient) {
+    function (vssService, gitClient) {
         var context = VSS.getWebContext();
         var gitHttpClient = vssService.getCollectionClient(gitClient.GitHttpClient);
 
@@ -258,7 +256,7 @@ VSS.require([
 
                                             else {
                                                 element.textContent = "";
-                                                
+
                                             }
                                         }
                                     }
@@ -267,6 +265,7 @@ VSS.require([
                     }
                     return Promise.all(requests);
                 }
-            );
+            )
+            .catch(e => VSS.notifyLoadFailed(e));
     }
 );
