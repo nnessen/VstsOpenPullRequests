@@ -97,6 +97,10 @@ td {
     height: 16px;
 }
 
+tr:nth-child(odd):not(.header-row) .vote {
+    background-color: #f4f4f4;
+}
+
 .suggestions {
     color: #107c10;
 }

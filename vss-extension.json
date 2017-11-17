@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "open-pull-requests",
-    "version": "0.0.33",
+    "version": "0.0.46",
     "name": "Open Pull Requests",
     "description": "A Visual Studio Services extension which displays all open pull requests across all repositories.",
     "publisher": "nnessen",
@@ -33,15 +33,12 @@
     ],
     "files": [
         {
+            "path": "node_modules/vss-web-extension-sdk/lib",
+            "addressable": true,
+            "packagePath": "lib"
+        },
+        {
             "path": "pullrequests.html",
-            "addressable": true
-        },
-        {
-            "path": "scripts",
-            "addressable": true
-        },
-        {
-            "path": "sdk/scripts",
             "addressable": true
         },
         {
@@ -49,8 +46,14 @@
             "addressable": true
         },
         {
-            "path": "css/app.css",
-            "addressable": true
+            "path": "src/app.css",
+            "addressable": true,
+            "packagePath": "app.css"
+        },
+        {
+            "path": "bin/main.js",
+            "addressable": true,
+            "packagePath": "main.js"
         }
     ]
 }

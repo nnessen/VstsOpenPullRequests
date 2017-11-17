@@ -1,0 +1,20 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "module": "system",
+        "moduleResolution": "node",
+        "outDir": "./bin",
+        "sourceMap": false,
+        "target": "es6",
+        "types": [
+            "vss-web-extension-sdk"
+        ]
+    },
+    "include": [
+        "./src/**/*.ts"
+    ],
+    "exclude": [
+        "node_modules",
+        "**/*.spec.ts"
+    ]
+}
