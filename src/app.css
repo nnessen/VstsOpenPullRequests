@@ -108,3 +108,19 @@ tr:nth-child(odd):not(.header-row) .vote {
 .vote::before {
     margin-left: 1px;
 }
+
+.no-results-container {
+    padding-top: 50px;
+    color: #f05133;
+    text-align: center;
+}
+
+.no-results-icon {
+    font-size: 65px !important;
+    line-height: normal !important;
+}
+
+.no-results-text {
+    padding-top: 12px;
+    font-size: 26px;
+}

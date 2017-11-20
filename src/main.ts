@@ -197,6 +197,14 @@ VSS.ready(() => {
                 .then(
                     pullRequests => {
                         VSS.notifyLoadSucceeded();
+
+                        if (!pullRequests || !pullRequests.length) {
+                            let noResults = document.getElementById("no-results");
+                            if (noResults) {
+                                noResults.className = noResults.className.replace("no-display", "");
+                            }
+                        }
+
                         return pullRequests;
                     }
                 )
