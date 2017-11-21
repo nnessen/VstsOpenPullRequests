@@ -124,3 +124,41 @@ tr:nth-child(odd):not(.header-row) .vote {
     padding-top: 12px;
     font-size: 26px;
 }
+
+.swirly-balls-container {
+    display: flex;
+    flex-flow: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding-top: 50px;
+}
+
+.swirly-balls {
+    border-radius: 50%;
+    border: 1.5px solid #c7e0f4;
+    border-top-color: #0078d7;
+    animation: spinAnimation 1.3s infinite cubic-bezier(.53,.21,.29,.67);
+    width: 28px;
+    height: 28px;
+}
+
+.swirly-balls.small {
+    width: 20px;
+    height: 20px;
+}
+
+.swirly-balls-label {
+    color: #0078d7;
+    margin-top: 10px;
+    font-size: 14px;
+}
+
+@keyframes spinAnimation {
+    0% {
+        transform: rotate(0deg)
+    }
+    100% {
+        transform: rotate(360deg)
+    }
+}

@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "open-pull-requests",
-    "version": "0.0.48",
+    "version": "0.0.55",
     "name": "Open Pull Requests",
     "description": "A Visual Studio Services extension which displays all open pull requests across all repositories.",
     "publisher": "nnessen",
@@ -15,7 +15,7 @@
     },
     "contributions": [
         {
-            "id": "nnessen.OpenPullRequests",
+            "id": "list",
             "type": "ms.vss-web.hub",
             "description": "Adds an 'Open Pull Requests' hub to the Code hub group.",
             "targets": [

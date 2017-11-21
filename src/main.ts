@@ -53,15 +53,22 @@ var createCommentsCell = function (row, index, rowIndex, pullRequest) {
     let icon = document.createElement("span");
     icon.id = `${rowIndex}|commentIcon`;
     icon.title = "Comments";
-    icon.className = "bowtie-icon bowtie-comment-discussion comment-icon no-display";
+    icon.className = "bowtie-icon bowtie-comment-discussion comment-icon";
+    this.hideElement(icon);
 
     let text = document.createElement("span");
     text.id = `${rowIndex}|commentCount`;
-    text.textContent = "Loading...";
+    text.textContent = "";
     text.className = "comment-count";
+    this.hideElement(text);
+
+    let swirly = document.createElement("div");
+    swirly.id = `${rowIndex}|swirly`;
+    swirly.className = "swirly-balls small";
 
     cell.appendChild(icon);
     cell.appendChild(text);
+    cell.appendChild(swirly);
 };
 
 var createImgCell = function (row, index, src, tooltip) {
@@ -172,6 +179,77 @@ var insertPullRequestRow = function (table, pullRequest, index, baseUri) {
     this.createCommentsCell(row, cell++, index, pullRequest);
 };
 
+var addClass = (element: HTMLElement, className: string) => {
+    element.className += ` ${className}`;
+};
+
+var hideElement = (element: HTMLElement) => {
+    this.addClass(element, "no-display");
+};
+
+var removeClass = (element: HTMLElement, className: string) => {
+    element.className = element.className.replace(className, "").replace("  ", " ").trim();
+};
+
+var showElement = (element: HTMLElement) => {
+    this.removeClass(element, "no-display");
+};
+
+var updateComments = (row, threads) => {
+    let pullComments = 0;
+    let unresolvedComments = 0;
+
+    for (let j = 0; threads.length > j; j++) {
+
+        let thread = threads[j];
+        if (!thread.properties["Microsoft.TeamFoundation.Discussion.UniqueID"]) { continue; }
+        if (thread.isDeleted) { continue; }
+
+        let status = +thread.status;
+        if (status >= 0) {
+            pullComments++;
+            switch(status) {
+                case 0:
+                case 1:
+                case 6:
+                    unresolvedComments++;
+                    break;
+            }
+        }
+    }
+
+    let swirly = document.getElementById(`${row}|swirly`);
+    if (swirly) {
+        this.hideElement(swirly);
+    }
+
+    let element = document.getElementById(`${row}|commentCount`);
+    let icon = document.getElementById(`${row}|commentIcon`);
+    if (element) {
+        if (pullComments > 0) {
+            this.showElement(element);
+
+            if (unresolvedComments == 0) {
+                element.textContent = "All resolved";
+                if (icon) {
+                    this.showElement(icon);
+                }
+                let cell = document.getElementById(`${row}|commentCell`);
+                if (cell) {
+                    this.addClass(cell, "comments-resolved");
+                }
+            }
+            else {
+                element.textContent = `${pullComments - unresolvedComments}/${pullComments} resolved`;
+                if (icon) {
+                    this.addClass(icon, "commens-unresolved");
+                    this.showElement(icon);
+                }
+            }
+        }
+    }
+};
+
 VSS.ready(() => {
     VSS.require([
         "VSS/Service",
@@ -181,9 +259,22 @@ VSS.ready(() => {
             var context = VSS.getWebContext();
             var gitHttpClient = vssService.getCollectionClient(gitClient.GitHttpClient);
 
+            if (context && gitHttpClient) {
+                VSS.notifyLoadSucceeded();
+            }
+            else {
+                VSS.notifyLoadFailed("Web Context or Git Client did not load.");
+                return;
+            }
+
             gitHttpClient.getPullRequestsByProject(context.project.name)
                 .then(
                     pullRequests => {
+                        let swirlyBalls = document.getElementById("swirly-balls");
+                        if (swirlyBalls) {
+                            this.hideElement(swirlyBalls);
+                        }
+
                         let baseUri = `${context.host.uri + context.project.name}`;
                         let table = document.getElementById("pull-request-table-body");
 
@@ -196,12 +287,10 @@ VSS.ready(() => {
                 )
                 .then(
                     pullRequests => {
-                        VSS.notifyLoadSucceeded();
-
                         if (!pullRequests || !pullRequests.length) {
                             let noResults = document.getElementById("no-results");
                             if (noResults) {
-                                noResults.className = noResults.className.replace("no-display", "");
+                                this.showElement(noResults);
                             }
                         }
 
@@ -217,56 +306,7 @@ VSS.ready(() => {
                                 gitHttpClient.getThreads(pullRequest.repository.id, pullRequest.pullRequestId)
                                     .then(
                                         threads => {
-                                            let pullComments = 0;
-                                            let unresolvedComments = 0;
-
-                                            for (let j = 0; threads.length > j; j++) {
-
-                                                let thread = threads[j];
-                                                if (!thread.properties["Microsoft.TeamFoundation.Discussion.UniqueID"]) { continue; }
-                                                if (thread.isDeleted) { continue; }
-
-                                                let status = +thread.status;
-                                                if (status >= 0) {
-                                                    pullComments++;
-                                                    switch(status) {
-                                                        case 0:
-                                                        case 1:
-                                                        case 6:
-                                                            unresolvedComments++;
-                                                            break;
-                                                    }
-                                                }
-                                            }
-
-                                            let element = document.getElementById(`${i}|commentCount`);
-                                            let icon = document.getElementById(`${i}|commentIcon`);
-                                            if (element) {
-                                                if (pullComments > 0) {
-                                                    if (unresolvedComments == 0) {
-                                                        element.textContent = "All resolved";
-                                                        if (icon) {
-                                                            icon.className = icon.className.replace("no-display", "");
-                                                        }
-                                                        let cell = document.getElementById(`${i}|commentCell`);
-                                                        if (cell) {
-                                                            cell.className += " comments-resolved";
-                                                        }
-                                                    }
-                                                    else {
-                                                        element.textContent = `${pullComments - unresolvedComments}/${pullComments} resolved`;
-                                                        if (icon) {
-                                                            icon.className += " comments-unresolved";
-                                                            icon.className = icon.className.replace("no-display", "");
-                                                        }
-                                                    }
-                                                }
-
-                                                else {
-                                                    element.textContent = "";
-
-                                                }
-                                            }
+                                            this.updateComments(i, threads);
                                         }
                                     )
                             );
