@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "open-pull-requests",
-    "version": "0.0.55",
+    "version": "0.0.57",
     "name": "Open Pull Requests",
     "description": "A Visual Studio Services extension which displays all open pull requests across all repositories.",
     "publisher": "nnessen",
@@ -51,7 +51,7 @@
             "packagePath": "app.css"
         },
         {
-            "path": "bin/main.js",
+            "path": "dist/bundle.js",
             "addressable": true,
             "packagePath": "main.js"
         }

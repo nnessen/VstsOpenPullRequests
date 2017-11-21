@@ -1,28 +1,30 @@
 {
-    "name": "vsts-open-pull-requests",
-    "version": "0.0.1",
-    "description": "A Visual Studio services extension which displays all open pull requests across all repositories.",
-    "main": "main.js",
-    "dependencies": {
-        "typescript": "2.6.1",
-        "vss-web-extension-sdk": "4.125.2"
-    },
-    "devDependencies": {
-        "@types/es6-promise": "0.0.33"
-    },
-    "scripts": {
-        "build": "tsc --outDir ./bin",
-        "package": "tfx extension create --manifest-globs vss-extension.json --rev-version --output-path ./bin/",
-        "test": "test"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/nnessen/VstsOpenPullRequests.git"
-    },
-    "author": "Nick Nessen",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/nnessen/VstsOpenPullRequests/issues"
-    },
-    "homepage": "https://github.com/nnessen/VstsOpenPullRequests#readme"
+  "name": "vsts-open-pull-requests",
+  "version": "0.0.1",
+  "description": "A Visual Studio services extension which displays all open pull requests across all repositories.",
+  "main": "main.js",
+  "dependencies": {
+    "typescript": "2.6.1",
+    "vss-web-extension-sdk": "4.125.2"
+  },
+  "devDependencies": {
+    "@types/es6-promise": "0.0.33",
+    "ts-loader": "3.1.1",
+    "webpack": "3.8.1"
+  },
+  "scripts": {
+    "build": "webpack",
+    "package": "tfx extension create --manifest-globs vss-extension.json --rev-version --output-path ./bin/",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nnessen/VstsOpenPullRequests.git"
+  },
+  "author": "Nick Nessen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nnessen/VstsOpenPullRequests/issues"
+  },
+  "homepage": "https://github.com/nnessen/VstsOpenPullRequests#readme"
 }
