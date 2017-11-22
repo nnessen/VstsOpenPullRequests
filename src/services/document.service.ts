@@ -63,10 +63,8 @@ export class DocumentService {
     }
 
     removeChildren(element: HTMLElement) {
-        if (!element.children) { return; }
-
-        for(let i = 0; i < element.children.length; i++) {
-            element.removeChild(element.children[i]);
+        while(element.lastChild) {
+            element.removeChild(element.lastChild);
         }
     }
 
