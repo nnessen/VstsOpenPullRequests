@@ -7,7 +7,10 @@
 </head>
 <body>
     <script src="main.js"></script>
-    <h1>Open Pull Requests</h1>
+    <div class="header">
+        <h1>Open Pull Requests</h1>
+        <button class="refresh-button" id="refresh-button"><span class="bowtie-icon bowtie-navigate-refresh"></span>Refresh</button>
+    </div>
     <div>
         <table id="pull-request-table">
             <thead>
@@ -25,7 +28,7 @@
             </thead>
             <tbody id="pull-request-table-body"></tbody>
         </table>
-        <div id="swirly-balls" class="swirly-balls-container">
+        <div id="swirly-balls" class="swirly-balls-container no-display">
             <div class="swirly-balls"></div>
             <div class="swirly-balls-label">Loading...</div>
         </div>

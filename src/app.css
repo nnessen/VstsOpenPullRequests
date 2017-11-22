@@ -7,9 +7,44 @@ body {
     width: 100vw;
 }
 
-h1 {
+.header {
     margin: 30px;
+    display: -ms-flexbox;
+    display: flex;
+}
+
+h1 {
     text-transform: uppercase;
+    flex: 3;
+}
+
+.refresh-button {
+    margin: auto;
+    font-size: 14px;
+    min-width: 80px;
+    height: 32px;
+    background-color: rgb(0, 120, 215);
+    color: rgb(255, 255, 255) !important;
+    outline: transparent;
+    border-width: 1px;
+    border-style: solid;
+    border-color: transparent !important;
+    border-image: initial;
+    text-decoration: none;
+}
+
+.refresh-button:hover:not(:disabled) {
+    background-color: rgb(0, 90, 158);
+    border-color: transparent !important;
+}
+
+.refresh-button:disabled {
+    background-color: rgb(234, 234, 234);
+    cursor: not-allowed;
+}
+
+.refresh-button .bowtie-navigate-refresh {
+    padding-right: 8px;
 }
 
 table {

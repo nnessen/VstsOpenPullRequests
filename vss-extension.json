@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "open-pull-requests",
-    "version": "0.0.57",
+    "version": "0.0.69",
     "name": "Open Pull Requests",
     "description": "A Visual Studio Services extension which displays all open pull requests across all repositories.",
     "publisher": "nnessen",
@@ -24,7 +24,7 @@
             "properties": {
                 "name": "Open Pull Requests",
                 "order": 99,
-                "uri": "pullrequests.html"
+                "uri": "index.html"
             }
         }
     ],
@@ -38,7 +38,7 @@
             "packagePath": "lib"
         },
         {
-            "path": "pullrequests.html",
+            "path": "index.html",
             "addressable": true
         },
         {

@@ -2,10 +2,13 @@ import { DocumentService } from './document.service';
 
 export class TableService {
 
+    table: HTMLTableElement;
+
     constructor(
         private documentService: DocumentService,
         private baseUri: string
     ) {
+        this.table = this.documentService.findElement<HTMLTableElement>("pull-request-table-body");
     }
 
     private addNewRow(table: HTMLTableElement, pullRequest, rowIndex: number) {
@@ -37,11 +40,13 @@ export class TableService {
     }
 
     addRows(pullRequests: any[]) {
-        let table = this.documentService.findElement<HTMLTableElement>("pull-request-table-body");
-
         for(let i = 0; i < pullRequests.length; i++) {
-            this.addNewRow(table, pullRequests[i], i);
+            this.addNewRow(this.table, pullRequests[i], i);
         }
+    }
+
+    clear() {
+        this.documentService.removeChildren(this.table);
     }
 
     private createAnchorCell(row: HTMLTableRowElement, cellIndex: number, text: string, href: string): HTMLTableDataCellElement {

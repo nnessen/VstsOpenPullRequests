@@ -32,6 +32,14 @@ export class DocumentService {
         return document.createTextNode(text);
     }
 
+    disableButton(element: HTMLButtonElement) {
+        element.disabled = true;
+    }
+
+    enableButton(element: HTMLButtonElement) {
+        element.disabled = false;
+    }
+
     findAndHideElement(id: string) {
         let element = this.findElement(id);
         if (element) {
@@ -52,6 +60,14 @@ export class DocumentService {
 
     hideElement(element: HTMLElement) {
         this.addClass(element, "no-display");
+    }
+
+    removeChildren(element: HTMLElement) {
+        if (!element.children) { return; }
+
+        for(let i = 0; i < element.children.length; i++) {
+            element.removeChild(element.children[i]);
+        }
     }
 
     removeClass(element: HTMLElement, className: string) {
