@@ -1,5 +1,7 @@
 export class DocumentService {
 
+    static hideClass = "no-display";
+
     addClass(element: HTMLElement, className: string) {
         element.className += ` ${className}`;
     }
@@ -28,7 +30,7 @@ export class DocumentService {
         return <HTMLSpanElement>this.createElement("span", id);
     }
 
-    createTextElement(text:string): Text {
+    createTextElement(text: string): Text {
         return document.createTextNode(text);
     }
 
@@ -59,7 +61,7 @@ export class DocumentService {
     }
 
     hideElement(element: HTMLElement) {
-        this.addClass(element, "no-display");
+        this.addClass(element, DocumentService.hideClass);
     }
 
     removeChildren(element: HTMLElement) {
@@ -73,6 +75,6 @@ export class DocumentService {
     }
 
     showElement(element: HTMLElement) {
-        this.removeClass(element, "no-display");
+        this.removeClass(element, DocumentService.hideClass);
     }
 }

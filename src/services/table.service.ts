@@ -249,7 +249,7 @@ export class TableService {
                 else {
                     element.textContent = `${pullComments - unresolvedComments}/${pullComments} resolved`;
                     if (icon) {
-                        this.documentService.addClass(icon, "commens-unresolved");
+                        this.documentService.addClass(icon, "comments-unresolved");
                         this.documentService.showElement(icon);
                     }
                 }

@@ -4,11 +4,14 @@ import { TableService } from './services/table.service';
 
 export class App {
 
+    static noResultsId = "no-results";
+    static refreshButtonId = "refresh-button";
+    static swirlyBallsId = "swirly-balls";
+
     documentService: DocumentService;
     pullRequestService: PullRequestService;
-    tableService: TableService;
-
     refreshButton: HTMLButtonElement;
+    tableService: TableService;
 
     constructor(
         context: WebContext,
@@ -19,22 +22,22 @@ export class App {
         this.pullRequestService = new PullRequestService(context, gitHttpClient);
         this.tableService = new TableService(this.documentService, baseUri);
 
-        this.refreshButton = this.documentService.findElement("refresh-button");
+        this.refreshButton = this.documentService.findElement(App.refreshButtonId);
         this.refreshButton.addEventListener("click", () => { this.reloadData(); });
     }
 
     loadData() {
         this.documentService.disableButton(this.refreshButton);
-        this.documentService.findAndShowElement("swirly-balls");
+        this.documentService.findAndShowElement(App.swirlyBallsId);
         this.pullRequestService.getPullRequests()
             .then(
                 pullRequests => {
                     this.documentService.enableButton(this.refreshButton);
-                    this.documentService.findAndHideElement("swirly-balls");
+                    this.documentService.findAndHideElement(App.swirlyBallsId);
                     this.tableService.addRows(pullRequests);
 
                     if (!pullRequests || !pullRequests.length) {
-                        this.documentService.findAndShowElement("no-results");
+                        this.documentService.findAndShowElement(App.noResultsId);
                     }
 
                     return pullRequests;
@@ -62,7 +65,7 @@ export class App {
 
     reloadData() {
         this.tableService.clear();
-        this.documentService.findAndHideElement("no-results");
+        this.documentService.findAndHideElement(App.noResultsId);
         this.loadData();
     }
 }
