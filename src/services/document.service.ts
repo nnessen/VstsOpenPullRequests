@@ -3,7 +3,7 @@ export class DocumentService {
     static hideClass = "no-display";
 
     addClass(element: HTMLElement, className: string) {
-        element.className += ` ${className}`;
+        element.classList.add(className);
     }
 
     createAnchorElement(id?: string): HTMLAnchorElement {
@@ -71,7 +71,7 @@ export class DocumentService {
     }
 
     removeClass(element: HTMLElement, className: string) {
-        element.className = element.className.replace(className, "").replace("  ", " ").trim();
+        element.classList.remove(className);
     }
 
     showElement(element: HTMLElement) {
