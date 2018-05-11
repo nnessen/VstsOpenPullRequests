@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1,
     "id": "open-pull-requests",
-    "version": "0.0.72",
+    "version": "0.0.79",
     "name": "Open Pull Requests",
     "description": "A Visual Studio Services extension which displays all open pull requests across all repositories.",
     "publisher": "nnessen",

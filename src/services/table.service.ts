@@ -34,7 +34,6 @@ export class TableService {
         this.createAnchorCell(row, cell++, pullRequest.title, pullUrl);
         this.createTextCell(row, cell++, dateValue);
         this.createBranchCell(row, cell++, pullRequest);
-        this.createMergeStatusCell(row, cell++, pullRequest.mergeStatus);
         this.createVotesCell(row, cell++, pullRequest);
         this.createCommentsCell(row, cell++, rowIndex, pullRequest);
     }
@@ -86,9 +85,39 @@ export class TableService {
         targetLink.text = targetBranch;
         target.appendChild(targetLink);
 
+        let mergeStatus = this.documentService.createSpanElement();
+        mergeStatus.classList.add("bowtie-icon", "merge-status");
+        mergeStatus.classList.add("bowtie-icon", "merge-status");
+
+        switch(pullRequest.mergeStatus) {
+            case 0:
+                break;
+            case 1:
+                mergeStatus.classList.add("bowtie-status-waiting-fill");
+                mergeStatus.title = "Merge Queued";
+                break;
+            case 2:
+                mergeStatus.classList.add("bowtie-status-failure");
+                mergeStatus.title = "Merge Conflicts";
+                break;
+            case 3:
+                mergeStatus.classList.add("bowtie-status-success");
+                mergeStatus.title = "Merge Succeeded";
+                break;
+            case 4:
+                mergeStatus.classList.add("bowtie-status-failure");
+                mergeStatus.title = "Rejected by Policy";
+                break;
+            default:
+                mergeStatus.classList.add("bowtie-status-failure");
+                mergeStatus.title = "Merge Failed";
+                break;
+        }
+
         container.appendChild(source);
         container.appendChild(into);
         container.appendChild(target);
+        container.appendChild(mergeStatus);
         cell.appendChild(container);
     }
 
@@ -127,27 +156,6 @@ export class TableService {
         img.alt = tooltip;
         img.title = tooltip;
         cell.appendChild(img);
-    }
-
-    private createMergeStatusCell(row: HTMLTableRowElement, cellIndex: number, status: number) {
-        let cell = this.createCell(row, cellIndex);
-        let text = "";
-        let textClass = "";
-
-        switch(status) {
-            case 3:
-                text = "Succeeded";
-                textClass = "merge-success";
-                break;
-            default:
-                text = "Failed";
-                textClass = "merge-failed";
-                break;
-        }
-
-        let node = this.documentService.createTextElement(text);
-        cell.className = textClass;
-        cell.appendChild(node);
     }
 
     private createTextCell(row: HTMLTableRowElement, cellIndex: number, text: string) {
