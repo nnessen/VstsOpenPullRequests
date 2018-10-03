@@ -12,6 +12,13 @@ body {
     display: flex;
 }
 
+.title-large {
+    line-height: 40px;
+    font-size: 28px;
+    letter-spacing: -.04em;
+    font-weight: bold;
+}
+
 h1 {
     text-transform: uppercase;
     flex: 3;
@@ -99,6 +106,18 @@ td {
 
 .comments-unresolved {
     color: #f8a800;
+}
+
+.rejected {
+    color: rgba(218,10,0,1);
+}
+
+.policy-status {
+    padding-right: 6px;
+}
+
+.policy-count {
+    padding-right: 3px;
 }
 
 .comment-icon {

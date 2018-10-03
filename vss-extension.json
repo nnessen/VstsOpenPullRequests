@@ -1,9 +1,9 @@
 {
     "manifestVersion": 1,
     "id": "open-pull-requests",
-    "version": "0.0.79",
+    "version": "0.0.121",
     "name": "Open Pull Requests",
-    "description": "A Visual Studio Services extension which displays all open pull requests across all repositories.",
+    "description": "An Azure DevOps extension which displays all open pull requests across all repositories.",
     "publisher": "nnessen",
     "targets": [
         {
@@ -55,5 +55,6 @@
             "addressable": true,
             "packagePath": "main.js"
         }
-    ]
+    ],
+    "categories": [ "Repos" ]
 }

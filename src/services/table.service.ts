@@ -35,6 +35,7 @@ export class TableService {
         this.createTextCell(row, cell++, dateValue);
         this.createBranchCell(row, cell++, pullRequest);
         this.createVotesCell(row, cell++, pullRequest);
+        this.createPoliciesCell(row, cell++, rowIndex, pullRequest);
         this.createCommentsCell(row, cell++, rowIndex, pullRequest);
     }
 
@@ -42,6 +43,10 @@ export class TableService {
         for(let i = 0; i < pullRequests.length; i++) {
             this.addNewRow(this.table, pullRequests[i], i);
         }
+    }
+
+    private capitalizeFirstLetter(string: string) {
+        return string.charAt(0).toUpperCase().concat(string.slice(1));
     }
 
     clear() {
@@ -158,6 +163,64 @@ export class TableService {
         cell.appendChild(img);
     }
 
+    private createPoliciesCell(row: HTMLTableRowElement, cellIndex: number, rowIndex: number, pullRequest) {
+        let cell = this.createCell(row, cellIndex);
+        cell.id = `${rowIndex}|policiesCell`;
+        cell.className = "comments";
+
+        let icon = this.documentService.createSpanElement(`${rowIndex}|policiesIcon`);
+        icon.title = "Policies";
+        icon.className = "bowtie-icon bowtie-policy comment-icon";
+        this.documentService.hideElement(icon);
+
+        let none = this.documentService.createSpanElement(this.getNoPoliciesId(rowIndex));
+        none.className = "policy-count";
+        none.textContent = "N/A";
+        this.documentService.hideElement(none);
+
+        let approved = this.createPolicyStatus(rowIndex, "approved", "success");
+        this.documentService.hideElement(approved);
+
+        let waiting = this.createPolicyStatus(rowIndex, "waiting", "waiting-fill");
+        this.documentService.hideElement(waiting);
+
+        let rejected = this.createPolicyStatus(rowIndex, "rejected", "failure");
+        this.documentService.hideElement(rejected);
+
+        let other = this.createPolicyStatus(rowIndex, "other", "help-outline");
+        this.documentService.hideElement(other);
+
+        let swirly = this.documentService.createDivElement(`${rowIndex}|policiesSwirly`);
+        swirly.className = "swirly-balls small";
+
+        cell.appendChild(icon);
+
+        cell.appendChild(none);
+        cell.appendChild(approved);
+        cell.appendChild(waiting);
+        cell.appendChild(rejected);
+        cell.appendChild(other);
+
+        cell.appendChild(swirly);
+    }
+
+    private createPolicyStatus(rowIndex: number, status: string, icon: string) {
+        let policyContainer = this.documentService.createSpanElement(this.getPolicyContainerId(rowIndex, status));
+        policyContainer.className = "policy-status";
+
+        let policyCount = this.documentService.createSpanElement(this.getPolicyCountId(rowIndex, status));
+        policyCount.className = "policy-count"
+        policyCount.textContent = "0";
+        policyContainer.appendChild(policyCount);
+
+        let policyIcon = this.documentService.createSpanElement(this.getPolicyIconId(rowIndex, status));
+        policyIcon.className = `bowtie-icon bowtie-status-${icon}`;
+        policyIcon.title = this.capitalizeFirstLetter(status);
+        policyContainer.appendChild(policyIcon);
+
+        return policyContainer;
+    }
+
     private createTextCell(row: HTMLTableRowElement, cellIndex: number, text: string) {
         let cell = this.createCell(row, cellIndex);
         let textNode = this.documentService.createTextElement(text);
@@ -213,6 +276,22 @@ export class TableService {
         }
     }
 
+    private getNoPoliciesId(rowIndex: number) {
+        return `${rowIndex}|policies|N/A`;
+    }
+
+    private getPolicyContainerId(rowIndex: number, status: string) {
+        return `${rowIndex}|policies|${status}`;
+    }
+
+    private getPolicyCountId(rowIndex: number, status: string) {
+        return `${rowIndex}|policies|${status}Count`;
+    }
+
+    private getPolicyIconId(rowIndex: number, status: string) {
+        return `${rowIndex}|policies|${status}Icon`;
+    }
+
     updateComments(rowIndex: number, threads: any[]) {
         let pullComments = 0;
         let unresolvedComments = 0;
@@ -261,6 +340,91 @@ export class TableService {
                         this.documentService.showElement(icon);
                     }
                 }
+            }
+        }
+    }
+
+    updatePolicies(rowIndex: number, policies) {
+        this.documentService.findAndHideElement(`${rowIndex}|policiesSwirly`);
+
+        let policyStatuses = {
+            approved: { count: 0, names: [] },
+            waiting: { count: 0, names: [] },
+            rejected: { count: 0, names: [] },
+            other: { count: 0, names: [] }
+        }
+
+        if (policies && policies.value && policies.value.length) {
+            for(let i = 0; i < policies.value.length; i++) {
+                let policy = policies.value[i];
+                switch(policy.status) {
+                    case "approved":
+                        policyStatuses.approved.count++;
+                        policyStatuses.approved.names = policyStatuses.approved.names.concat(
+                            policy.configuration.type.displayName
+                        );
+                        break;
+                    case "broken":
+                    case "rejected":
+                        policyStatuses.rejected.count++;
+                        policyStatuses.rejected.names = policyStatuses.rejected.names.concat(
+                            policy.configuration.type.displayName
+                        );
+                        break;
+                    case "queued":
+                    case "running":
+                        policyStatuses.waiting.count++;
+                        policyStatuses.waiting.names = policyStatuses.waiting.names.concat(
+                            policy.configuration.type.displayName
+                        );
+                        break;
+                    default:
+                        policyStatuses.other.count++;
+                        policyStatuses.other.names = policyStatuses.other.names.concat(
+                            policy.configuration.type.displayName
+                        );
+                        break;
+                }
+            }
+        } else {
+            this.documentService.findAndShowElement(`${rowIndex}|policiesIcon`);
+            this.documentService.findAndShowElement(this.getNoPoliciesId(rowIndex));
+            return;
+        }
+
+        let icon: HTMLSpanElement = this.documentService.findElement(`${rowIndex}|policiesIcon`);
+        if (icon) {
+            if (policyStatuses.rejected.count) {
+                this.documentService.addClass(icon, "rejected");
+            } else if (policyStatuses.waiting.count) {
+                this.documentService.addClass(icon, "comments-unresolved");
+            } else {
+                let cell = this.documentService.findElement(`${rowIndex}|policiesCell`);
+                if (cell) {
+                    this.documentService.addClass(cell, "comments-resolved");
+                }
+            }
+            this.documentService.showElement(icon);
+        }
+
+        let cell = this.documentService.findElement(`${rowIndex}|policiesCell`);
+        cell.title = "";
+        for(let policyStatus in policyStatuses) {
+            if (policyStatuses[policyStatus].count) {
+                let statusCount = this.documentService.findElement(this.getPolicyCountId(rowIndex, policyStatus));
+                if (statusCount) {
+                    statusCount.textContent = policyStatuses[policyStatus].count;
+                    if (cell.title) {
+                        cell.title += "\n";
+                    }
+                    cell.title += `${policyStatus.toLocaleUpperCase()}:\n`;
+                    policyStatuses[policyStatus].names.forEach(
+                        name => {
+                            cell.title += `${name}\n`;
+                        }
+                    );
+                }
+                this.documentService.findAndShowElement(this.getPolicyContainerId(rowIndex, policyStatus));
             }
         }
     }

@@ -1,4 +1,5 @@
 import { App } from './app';
+import { TokenService } from './services/token.service';
 
 VSS.init({
     explicitNotifyLoaded: true,
@@ -9,9 +10,10 @@ VSS.init({
 VSS.ready(() => {
     VSS.require([
         "VSS/Service",
-        "TFS/VersionControl/GitRestClient"
+        "TFS/VersionControl/GitRestClient",
+        "VSS/OrganizationPolicy/RestClient"
         ],
-        (vssService, gitClient) => {
+        (vssService, gitClient, policyClient) => {
 
             let context = VSS.getWebContext();
             let gitHttpClient = vssService.getCollectionClient(gitClient.GitHttpClient);
@@ -25,7 +27,8 @@ VSS.ready(() => {
             }
 
             let baseUri = `${context.host.uri + context.project.name}`;
-            let app = new App(context, gitHttpClient, baseUri);
+            let tokenService = new TokenService(VSS.getAccessToken);
+            let app = new App(context, gitHttpClient, baseUri, tokenService);
             app.loadData();
         }
     )
