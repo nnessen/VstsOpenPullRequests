@@ -11,6 +11,61 @@ export class TableService {
         this.table = this.documentService.findElement<HTMLTableElement>("pull-request-table-body");
     }
 
+    private createPullRequestCell(
+        row: HTMLTableRowElement,
+        cellIndex: number,
+        rowIndex: number,
+        pullUrl: string,
+        repoUrl: string,
+        pullRequest
+    ) {
+        let cell = this.createCell(row, cellIndex);
+        cell.id = `${rowIndex}|pullRequestCell`;
+
+        let container = this.documentService.createDivElement();
+        container.className = "flex-container";
+
+        let author = this.documentService.createImgElement();
+        author.src = pullRequest.createdBy.imageUrl;
+        author.alt = pullRequest.createdBy.displayName;
+        author.title = author.alt;
+        author.className = "author-image";
+        container.appendChild(author);
+
+        let subContainer = this.documentService.createDivElement();
+        subContainer.className = "flex-container vertical flex-fill";
+
+        let titleContainer = this.documentService.createSpanElement();
+        titleContainer.className = "flex-fill";
+        let title = this.documentService.createAnchorElement();
+        title.href = pullUrl;
+        title.text = pullRequest.title;
+        title.target = "_parent";
+        titleContainer.appendChild(title);
+        subContainer.appendChild(titleContainer);
+
+        let gitContainer = this.documentService.createDivElement();
+        gitContainer.className = "git-row flex-fill";
+
+        let repo = this.documentService.createSpanElement();
+        repo.className = "bowtie-icon bowtie-git";
+        repo.title = "Repository";
+        let repoAnchor = this.documentService.createAnchorElement();
+        repoAnchor.href = repoUrl;
+        repoAnchor.text = pullRequest.repository.name;
+        repoAnchor.target = "_parent";
+        repoAnchor.className = "repo-link";
+        repo.appendChild(repoAnchor);
+        gitContainer.appendChild(repo);
+
+        this.createBranch(gitContainer, pullRequest);
+
+        subContainer.appendChild(gitContainer);
+        container.appendChild(subContainer);
+
+        cell.appendChild(container);
+    }
+
     private addNewRow(table: HTMLTableElement, pullRequest, rowIndex: number) {
 
         let repoUrl = `${this.baseUri}/_git/${pullRequest.repository.name}`;
@@ -29,11 +84,12 @@ export class TableService {
         let row = table.insertRow(rowIndex);
 
         this.createAnchorCell(row, cell++, pullRequest.pullRequestId, pullUrl);
-        this.createImgCell(row, cell++, pullRequest.createdBy.imageUrl, pullRequest.createdBy.displayName);
-        this.createAnchorCell(row, cell++, pullRequest.repository.name, repoUrl);
-        this.createAnchorCell(row, cell++, pullRequest.title, pullUrl);
-        this.createTextCell(row, cell++, dateValue);
-        this.createBranchCell(row, cell++, pullRequest);
+        this.createPullRequestCell(row, cell++, rowIndex, pullUrl, repoUrl, pullRequest);
+        //this.createImgCell(row, cell++, pullRequest.createdBy.imageUrl, pullRequest.createdBy.displayName);
+        //this.createAnchorCell(row, cell++, pullRequest.repository.name, repoUrl);
+        //this.createAnchorCell(row, cell++, pullRequest.title, pullUrl);
+        //this.createTextCell(row, cell++, dateValue);
+        //this.createBranchCell(row, cell++, pullRequest);
         this.createVotesCell(row, cell++, pullRequest);
         this.createPoliciesCell(row, cell++, rowIndex, pullRequest);
         this.createCommentsCell(row, cell++, rowIndex, pullRequest);
@@ -62,6 +118,70 @@ export class TableService {
         cell.appendChild(anchor);
 
         return cell;
+    }
+
+    private createBranch(parent: HTMLElement, pullRequest) {
+        let sourceBranch = pullRequest.sourceRefName.replace("refs/heads/", "");
+        let targetBranch = pullRequest.targetRefName.replace("refs/heads/", "");
+
+        let container = this.documentService.createSpanElement();
+        let source = this.documentService.createSpanElement();
+        let into = this.documentService.createSpanElement();
+        let target = this.documentService.createSpanElement();
+
+        source.className = "bowtie-icon bowtie-tfvc-branch";
+        source.title = "Source Branch";
+        let sourceLink = this.documentService.createAnchorElement();
+        sourceLink.href = `${this.baseUri}/_git/${pullRequest.repository.name}#version=GB${sourceBranch}`;
+        sourceLink.target = "_parent";
+        sourceLink.text = sourceBranch;
+        source.appendChild(sourceLink);
+
+        into.className = "bowtie-icon bowtie-arrow-right pull-into";
+
+        target.className = "bowtie-icon bowtie-tfvc-branch";
+        target.title = "Target Branch";
+        let targetLink = this.documentService.createAnchorElement();
+        targetLink.href = `${this.baseUri}/_git/${pullRequest.repository.name}#version=GB${targetBranch}`;
+        targetLink.target = "_parent";
+        targetLink.text = targetBranch;
+        target.appendChild(targetLink);
+
+        let mergeStatus = this.documentService.createSpanElement();
+        mergeStatus.classList.add("bowtie-icon", "merge-status");
+        mergeStatus.classList.add("bowtie-icon", "merge-status");
+
+        switch(pullRequest.mergeStatus) {
+            case 0:
+                break;
+            case 1:
+                mergeStatus.classList.add("bowtie-status-waiting-fill");
+                mergeStatus.title = "Merge Queued";
+                break;
+            case 2:
+                mergeStatus.classList.add("bowtie-status-failure");
+                mergeStatus.title = "Merge Conflicts";
+                break;
+            case 3:
+                mergeStatus.classList.add("bowtie-status-success");
+                mergeStatus.title = "Merge Succeeded";
+                break;
+            case 4:
+                mergeStatus.classList.add("bowtie-status-failure");
+                mergeStatus.title = "Rejected by Policy";
+                break;
+            default:
+                mergeStatus.classList.add("bowtie-status-failure");
+                mergeStatus.title = "Merge Failed";
+                break;
+        }
+
+        container.appendChild(source);
+        container.appendChild(into);
+        container.appendChild(target);
+        container.appendChild(mergeStatus);
+
+        parent.appendChild(container);
     }
 
     private createBranchCell(row: HTMLTableRowElement, cellIndex: number, pullRequest) {
