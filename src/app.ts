@@ -1,5 +1,4 @@
 import { DocumentService } from './services/document.service';
-import { PoliciesService } from './services/policies.service';
 import { PullRequestService } from './services/pull-request.service';
 import { TableService } from './services/table.service';
 import { TokenService } from './services/token.service';
@@ -11,7 +10,6 @@ export class App {
     static swirlyBallsId = "swirly-balls";
 
     documentService: DocumentService;
-    policiesService: PoliciesService;
     pullRequestService: PullRequestService;
     refreshButton: HTMLButtonElement;
     tableService: TableService;
@@ -23,11 +21,11 @@ export class App {
         baseUri: string,
         tokenService: TokenService
     ) {
-        this.documentService = new DocumentService();
-        this.pullRequestService = new PullRequestService(context, gitHttpClient);
-        this.tableService = new TableService(this.documentService, baseUri);
         this.tokenService = tokenService;
-        this.policiesService = new PoliciesService(context, baseUri, this.tokenService);
+        this.documentService = new DocumentService();
+
+        this.pullRequestService = new PullRequestService(context, gitHttpClient, baseUri, this.tokenService);
+        this.tableService = new TableService(this.documentService, baseUri);
 
         this.refreshButton = this.documentService.findElement(App.refreshButtonId);
         this.refreshButton.addEventListener("click", () => { this.reloadData(); });
@@ -66,7 +64,7 @@ export class App {
                         );
 
                         requests.push(
-                            this.policiesService.getPullRequestPolicies(pullRequest.pullRequestId)
+                            this.pullRequestService.getPullRequestPolicies(pullRequest.pullRequestId)
                                 .then(
                                     policies => {
                                         this.tableService.updatePolicies(i, policies);

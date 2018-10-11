@@ -70,26 +70,12 @@ export class TableService {
 
         let repoUrl = `${this.baseUri}/_git/${pullRequest.repository.name}`;
         let pullUrl = `${this.baseUri}/_git/${pullRequest.repository.id}/pullRequest/${pullRequest.pullRequestId}`;
-        let idValue = `<a href="${pullUrl}" target="_parent">${pullRequest.pullRequestId}</a>`;
-
-        let date = new Date(pullRequest.creationDate);
-        let dateValue = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
-
-        var reviewers = "";
-        for (let i = 0; i < pullRequest.reviewers.length; i++) {
-            reviewers += `<img class="row-image" src="${pullRequest.reviewers[i].imageUrl}" />`;
-        }
 
         let cell = 0;
         let row = table.insertRow(rowIndex);
 
         this.createAnchorCell(row, cell++, pullRequest.pullRequestId, pullUrl);
         this.createPullRequestCell(row, cell++, rowIndex, pullUrl, repoUrl, pullRequest);
-        //this.createImgCell(row, cell++, pullRequest.createdBy.imageUrl, pullRequest.createdBy.displayName);
-        //this.createAnchorCell(row, cell++, pullRequest.repository.name, repoUrl);
-        //this.createAnchorCell(row, cell++, pullRequest.title, pullUrl);
-        //this.createTextCell(row, cell++, dateValue);
-        //this.createBranchCell(row, cell++, pullRequest);
         this.createVotesCell(row, cell++, pullRequest);
         this.createPoliciesCell(row, cell++, rowIndex, pullRequest);
         this.createCommentsCell(row, cell++, rowIndex, pullRequest);
@@ -184,68 +170,6 @@ export class TableService {
         parent.appendChild(container);
     }
 
-    private createBranchCell(row: HTMLTableRowElement, cellIndex: number, pullRequest) {
-        let cell = this.createCell(row, cellIndex);
-        let sourceBranch = pullRequest.sourceRefName.replace("refs/heads/", "");
-        let targetBranch = pullRequest.targetRefName.replace("refs/heads/", "");
-
-        let container = this.documentService.createSpanElement();
-        let source = this.documentService.createSpanElement();
-        let into = this.documentService.createSpanElement();
-        let target = this.documentService.createSpanElement();
-
-        source.className = "bowtie-icon bowtie-tfvc-branch";
-        let sourceLink = this.documentService.createAnchorElement();
-        sourceLink.href = `${this.baseUri}/_git/${pullRequest.repository.name}#version=GB${sourceBranch}`;
-        sourceLink.target = "_parent";
-        sourceLink.text = sourceBranch;
-        source.appendChild(sourceLink);
-
-        into.className = "bowtie-icon bowtie-arrow-right pull-into";
-
-        target.className = "bowtie-icon bowtie-tfvc-branch";
-        let targetLink = this.documentService.createAnchorElement();
-        targetLink.href = `${this.baseUri}/_git/${pullRequest.repository.name}#version=GB${targetBranch}`;
-        targetLink.target = "_parent";
-        targetLink.text = targetBranch;
-        target.appendChild(targetLink);
-
-        let mergeStatus = this.documentService.createSpanElement();
-        mergeStatus.classList.add("bowtie-icon", "merge-status");
-        mergeStatus.classList.add("bowtie-icon", "merge-status");
-
-        switch(pullRequest.mergeStatus) {
-            case 0:
-                break;
-            case 1:
-                mergeStatus.classList.add("bowtie-status-waiting-fill");
-                mergeStatus.title = "Merge Queued";
-                break;
-            case 2:
-                mergeStatus.classList.add("bowtie-status-failure");
-                mergeStatus.title = "Merge Conflicts";
-                break;
-            case 3:
-                mergeStatus.classList.add("bowtie-status-success");
-                mergeStatus.title = "Merge Succeeded";
-                break;
-            case 4:
-                mergeStatus.classList.add("bowtie-status-failure");
-                mergeStatus.title = "Rejected by Policy";
-                break;
-            default:
-                mergeStatus.classList.add("bowtie-status-failure");
-                mergeStatus.title = "Merge Failed";
-                break;
-        }
-
-        container.appendChild(source);
-        container.appendChild(into);
-        container.appendChild(target);
-        container.appendChild(mergeStatus);
-        cell.appendChild(container);
-    }
-
     private createCell(row: HTMLTableRowElement, cellIndex: number): HTMLTableDataCellElement {
         return row.insertCell(cellIndex);
     }
@@ -271,16 +195,6 @@ export class TableService {
         cell.appendChild(icon);
         cell.appendChild(text);
         cell.appendChild(swirly);
-    }
-
-    private createImgCell(row: HTMLTableRowElement, cellIndex: number, src: string, tooltip: string) {
-        let cell = this.createCell(row, cellIndex);
-        let img = this.documentService.createImgElement();
-        img.src = src;
-        img.className = "row-image";
-        img.alt = tooltip;
-        img.title = tooltip;
-        cell.appendChild(img);
     }
 
     private createPoliciesCell(row: HTMLTableRowElement, cellIndex: number, rowIndex: number, pullRequest) {
@@ -339,12 +253,6 @@ export class TableService {
         policyContainer.appendChild(policyIcon);
 
         return policyContainer;
-    }
-
-    private createTextCell(row: HTMLTableRowElement, cellIndex: number, text: string) {
-        let cell = this.createCell(row, cellIndex);
-        let textNode = this.documentService.createTextElement(text);
-        cell.appendChild(textNode);
     }
 
     private createVotesCell(row: HTMLTableRowElement, cellIndex: number, pullRequest) {
