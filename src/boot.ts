@@ -10,10 +10,9 @@ VSS.init({
 VSS.ready(() => {
     VSS.require([
         "VSS/Service",
-        "TFS/VersionControl/GitRestClient",
-        "VSS/OrganizationPolicy/RestClient"
+        "TFS/VersionControl/GitRestClient"
         ],
-        (vssService, gitClient, policyClient) => {
+        (vssService, gitClient) => {
 
             let context = VSS.getWebContext();
             let gitHttpClient = vssService.getCollectionClient(gitClient.GitHttpClient);

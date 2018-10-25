@@ -168,6 +168,41 @@ td {
     vertical-align: bottom;
 }
 
+.policy-type {
+    color: white;
+    margin-top: 2.5px;
+    margin-bottom: 2.5px;
+    padding-top: 8px;
+    width: 30px;
+    height: 30px;
+    display: inline-block;
+}
+
+.policy-type.failed {
+    background-color: rgba(218,10,0,1);
+}
+
+.policy-type.waiting {
+    background-color: rgba(248,168,0,1);
+}
+
+.policy-type.approved {
+    background-color: rgba(16,124,16,1);
+    font-size: 16px;
+    padding-top: 4px;
+    text-align: center;
+    cursor: default;
+}
+
+.policy-type.other {
+    background-color: gray;
+}
+
+.policy-type.all-approved {
+    font-size: 14px;
+    padding-top: 5px;
+}
+
 .vote {
     margin-left: -9px;
     margin-top: 14px;
@@ -176,6 +211,10 @@ td {
     border-radius: 50%;
     width: 16px;
     height: 16px;
+}
+
+.reviewer-container.approved .vote {
+    margin-left: -7px;
 }
 
 .suggestions {

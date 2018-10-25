@@ -87,10 +87,6 @@ export class TableService {
         }
     }
 
-    private capitalizeFirstLetter(string: string) {
-        return string.charAt(0).toUpperCase().concat(string.slice(1));
-    }
-
     clear() {
         this.documentService.removeChildren(this.table);
     }
@@ -202,57 +198,24 @@ export class TableService {
         cell.id = `${rowIndex}|policiesCell`;
         cell.className = "comments";
 
-        let icon = this.documentService.createSpanElement(`${rowIndex}|policiesIcon`);
-        icon.title = "Policies";
-        icon.className = "bowtie-icon bowtie-policy comment-icon";
-        this.documentService.hideElement(icon);
-
-        let none = this.documentService.createSpanElement(this.getNoPoliciesId(rowIndex));
-        none.className = "policy-count";
-        none.textContent = "N/A";
-        this.documentService.hideElement(none);
-
-        let approved = this.createPolicyStatus(rowIndex, "approved", "success");
-        this.documentService.hideElement(approved);
-
-        let waiting = this.createPolicyStatus(rowIndex, "waiting", "waiting-fill");
-        this.documentService.hideElement(waiting);
-
-        let rejected = this.createPolicyStatus(rowIndex, "rejected", "failure");
-        this.documentService.hideElement(rejected);
-
-        let other = this.createPolicyStatus(rowIndex, "other", "help-outline");
-        this.documentService.hideElement(other);
-
         let swirly = this.documentService.createDivElement(`${rowIndex}|policiesSwirly`);
         swirly.className = "swirly-balls small";
 
-        cell.appendChild(icon);
+        let approved = this.documentService.createSpanElement(`${rowIndex}|policiesApproved`);
+        approved.className = "reviewer-container approved";
+        this.documentService.hideElement(approved);
+        let approvedCircle = this.documentService.createSpanElement(`${rowIndex}|policiesApprovedCount`);
+        approvedCircle.className = "row-image policy-type approved";
+        approvedCircle.textContent = "";
+        approvedCircle.title = "";
+        approved.appendChild(approvedCircle);
+        let approvedBadge = this.documentService.createSpanElement();
+        approvedBadge.className = "bowtie-icon bowtie-status-success vote-overlay vote";
+        approvedBadge.title = "Approved";
+        approved.appendChild(approvedBadge);
 
-        cell.appendChild(none);
         cell.appendChild(approved);
-        cell.appendChild(waiting);
-        cell.appendChild(rejected);
-        cell.appendChild(other);
-
         cell.appendChild(swirly);
-    }
-
-    private createPolicyStatus(rowIndex: number, status: string, icon: string) {
-        let policyContainer = this.documentService.createSpanElement(this.getPolicyContainerId(rowIndex, status));
-        policyContainer.className = "policy-status";
-
-        let policyCount = this.documentService.createSpanElement(this.getPolicyCountId(rowIndex, status));
-        policyCount.className = "policy-count"
-        policyCount.textContent = "0";
-        policyContainer.appendChild(policyCount);
-
-        let policyIcon = this.documentService.createSpanElement(this.getPolicyIconId(rowIndex, status));
-        policyIcon.className = `bowtie-icon bowtie-status-${icon}`;
-        policyIcon.title = this.capitalizeFirstLetter(status);
-        policyContainer.appendChild(policyIcon);
-
-        return policyContainer;
     }
 
     private createVotesCell(row: HTMLTableRowElement, cellIndex: number, pullRequest) {
@@ -304,20 +267,42 @@ export class TableService {
         }
     }
 
-    private getNoPoliciesId(rowIndex: number) {
-        return `${rowIndex}|policies|N/A`;
+    private getPolicyStatusClass(policyStatus: number) {
+        switch(policyStatus) {
+            case 3:
+                return "failed";
+            case 1:
+                return "waiting";
+            case 0:
+                return "approved";
+            default:
+                return "other";
+        }
     }
 
-    private getPolicyContainerId(rowIndex: number, status: string) {
-        return `${rowIndex}|policies|${status}`;
+    private getPolicyStatusDisplayName(policyStatus: number) {
+        switch(policyStatus) {
+            case 3:
+                return "REJECTED";
+            case 1:
+                return "WAITING";
+            case 0:
+                return "APPROVED";
+            default:
+                return "UNKNOWN";
+        }
     }
 
-    private getPolicyCountId(rowIndex: number, status: string) {
-        return `${rowIndex}|policies|${status}Count`;
-    }
+    private getPolicyIcon(displayName: string) {
+        displayName = displayName.toLowerCase();
+        if (displayName.indexOf("build") >= 0) { return "bowtie-build"; }
+        if (displayName.indexOf("merge") >= 0) { return "bowtie-tfvc-merge"; }
+        if (displayName.indexOf("work item") >= 0) { return "bowtie-symbol-task"; }
+        if (displayName.indexOf("comment") >= 0) { return "bowtie-comment"; }
+        if (displayName.indexOf("required") >= 0) { return "bowtie-security"; }
+        if (displayName.indexOf("reviewer") >= 0) { return "bowtie-users"; }
 
-    private getPolicyIconId(rowIndex: number, status: string) {
-        return `${rowIndex}|policies|${status}Icon`;
+        return "bowtie-policy";
     }
 
     updateComments(rowIndex: number, threads: any[]) {
@@ -375,84 +360,58 @@ export class TableService {
     updatePolicies(rowIndex: number, policies) {
         this.documentService.findAndHideElement(`${rowIndex}|policiesSwirly`);
 
-        let policyStatuses = {
-            approved: { count: 0, names: [] },
-            waiting: { count: 0, names: [] },
-            rejected: { count: 0, names: [] },
-            other: { count: 0, names: [] }
-        }
-
-        if (policies && policies.value && policies.value.length) {
-            for(let i = 0; i < policies.value.length; i++) {
-                let policy = policies.value[i];
-                switch(policy.status) {
-                    case "approved":
-                        policyStatuses.approved.count++;
-                        policyStatuses.approved.names = policyStatuses.approved.names.concat(
-                            policy.configuration.type.displayName
-                        );
-                        break;
-                    case "broken":
-                    case "rejected":
-                        policyStatuses.rejected.count++;
-                        policyStatuses.rejected.names = policyStatuses.rejected.names.concat(
-                            policy.configuration.type.displayName
-                        );
-                        break;
-                    case "queued":
-                    case "running":
-                        policyStatuses.waiting.count++;
-                        policyStatuses.waiting.names = policyStatuses.waiting.names.concat(
-                            policy.configuration.type.displayName
-                        );
-                        break;
-                    default:
-                        policyStatuses.other.count++;
-                        policyStatuses.other.names = policyStatuses.other.names.concat(
-                            policy.configuration.type.displayName
-                        );
-                        break;
-                }
-            }
-        } else {
-            this.documentService.findAndShowElement(`${rowIndex}|policiesIcon`);
-            this.documentService.findAndShowElement(this.getNoPoliciesId(rowIndex));
-            return;
-        }
-
-        let icon: HTMLSpanElement = this.documentService.findElement(`${rowIndex}|policiesIcon`);
-        if (icon) {
-            if (policyStatuses.rejected.count) {
-                this.documentService.addClass(icon, "rejected");
-            } else if (policyStatuses.waiting.count) {
-                this.documentService.addClass(icon, "comments-unresolved");
-            } else {
-                let cell = this.documentService.findElement(`${rowIndex}|policiesCell`);
-                if (cell) {
-                    this.documentService.addClass(cell, "comments-resolved");
-                }
-            }
-            this.documentService.showElement(icon);
-        }
-
         let cell = this.documentService.findElement(`${rowIndex}|policiesCell`);
-        cell.title = "";
-        for(let policyStatus in policyStatuses) {
-            if (policyStatuses[policyStatus].count) {
-                let statusCount = this.documentService.findElement(this.getPolicyCountId(rowIndex, policyStatus));
-                if (statusCount) {
-                    statusCount.textContent = policyStatuses[policyStatus].count;
-                    if (cell.title) {
-                        cell.title += "\n";
-                    }
-                    cell.title += `${policyStatus.toLocaleUpperCase()}:\n`;
-                    policyStatuses[policyStatus].names.forEach(
-                        name => {
-                            cell.title += `${name}\n`;
-                        }
-                    );
+        let policyStatuses = {
+            approved: 0,
+            queued: 1,
+            running: 1,
+            rejected: 3,
+            broken: 3
+        };
+        let policyCount = 0;
+        let policyTypes = {};
+        if (policies && policies.value && policies.value.length) {
+            for (let i = 0; i < policies.value.length; i++) {
+                let policy = policies.value[i];
+                if (!policyTypes[policy.configuration.type.displayName] ||
+                    (policyTypes[policy.configuration.type.displayName] &&
+                     policyStatuses[policy.status] > policyTypes[policy.configuration.type.displayName])
+                ) {
+                    policyTypes[policy.configuration.type.displayName] = policyStatuses[policy.status];
                 }
-                this.documentService.findAndShowElement(this.getPolicyContainerId(rowIndex, policyStatus));
+            }
+
+            let approved = [];
+            for (let policyType in policyTypes) {
+                policyCount++;
+                if (policyTypes[policyType] == 0) {
+                    approved = approved.concat(policyType);
+                }
+                else {
+                    let policyContainer = this.documentService.createSpanElement();
+                    policyContainer.className = "reviewer-container"
+                    let policyHolder = this.documentService.createSpanElement();
+                    let icon = this.getPolicyIcon(policyType);
+                    let color = this.getPolicyStatusClass(policyTypes[policyType]);
+                    policyHolder.className = `row-image policy-type bowtie-icon ${icon} ${color}`;
+                    policyHolder.title = `${policyType}\n${this.getPolicyStatusDisplayName(policyTypes[policyType])}`;
+                    policyContainer.appendChild(policyHolder);
+                    cell.appendChild(policyContainer);
+                }
+            }
+            if (approved.length) {
+                let approvedElement = this.documentService.findElement(`${rowIndex}|policiesApprovedCount`);
+                if (approvedElement) {
+                    if (approved.length == policyCount) {
+                        approvedElement.textContent = "All";
+                        this.documentService.addClass(approvedElement, "all-approved");
+                    }
+                    else {
+                        approvedElement.textContent = approved.length.toString();
+                    }
+                    approvedElement.title = approved.join("\n");
+                    this.documentService.findAndShowElement(`${rowIndex}|policiesApproved`);
+                }
             }
         }
     }
