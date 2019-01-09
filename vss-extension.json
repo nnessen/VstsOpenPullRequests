@@ -1,8 +1,8 @@
 {
     "manifestVersion": 1,
-    "id": "open-pull-requests-beta",
-    "version": "0.0.148",
-    "name": "Open Pull Requests Beta",
+    "id": "open-pull-requests",
+    "version": "0.0.150",
+    "name": "Open Pull Requests",
     "description": "An Azure DevOps extension which displays all open pull requests across all repositories.",
     "publisher": "nnessen",
     "targets": [
