@@ -312,9 +312,7 @@ export class TableService {
         for (let j = 0; threads.length > j; j++) {
 
             let thread = threads[j];
-            if (!thread.properties) { continue; }
-            if (!thread.properties["Microsoft.TeamFoundation.Discussion.UniqueID"]) { continue; }
-            if (thread.isDeleted) { continue; }
+            if (!thread || thread.isDeleted) { continue; }
 
             let status = +thread.status;
             if (status >= 0) {
